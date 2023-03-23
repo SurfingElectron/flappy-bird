@@ -1,7 +1,7 @@
 import pygame, sys, random
 
 # HELPER FUNCTIONS
-# Draws 2 floor surfaces and continually move them LEFT 
+# Draw 2 floor surfaces and continually move them LEFT 
 def draw_floor():
     screen.blit(floor_surface, (floor_x_pos,900))
     screen.blit(floor_surface, (floor_x_pos + 576,900))
@@ -17,7 +17,9 @@ def create_pipe():
 def move_pipes(pipes):
     for pipe in pipes:
         pipe.centerx -= 5
-    return pipes
+    # Only copies over pipes still on the screen, ensures pipes_list doesn't get too big if player does well
+    visible_pipes = [pipe for pipe in pipes if pipe.right > -50]
+    return visible_pipes
 
 # Draws the pipes
 def draw_pipes(pipes):
@@ -73,10 +75,21 @@ def update_scores(score, high_score):
         high_score = score
     return high_score
 
-# LET'S GOOOOOO
-# Initiates mixer, pygame, create a display surface, create a clock object so we can limit frame rate
+# Checks if the bird has passed a pipe, updates the score
+def score_increment():
+    global score, scoring_enabled
+    if pipe_list:
+        for pipe in pipe_list:
+            if 95 < pipe.centerx < 105 and scoring_enabled:
+                score += 1
+                score_sound.play()
+                scoring_enabled = False
+            if pipe.centerx < 0:
+                scoring_enabled = True
 
-pygame.mixer.pre_init(frequency = 44100, size = 16, channels = 2, buffer = 512)
+# LET'S GOOOOOO
+# Initiates pygame, create a display surface, create a clock object so we can limit frame rate
+
 pygame.init()
 screen = pygame.display.set_mode((576,1024))
 clock = pygame.time.Clock()
@@ -88,6 +101,7 @@ bird_movement = 0
 game_active = True
 score = 0
 high_score = 0
+scoring_enabled = True
 
 # SPRITES
 bg_surface = pygame.transform.scale2x(pygame.image.load('assets/background-day.png').convert())
@@ -140,7 +154,7 @@ while True:
                 bird_rect.center = (100, 512)
                 bird_movement = 0
                 score = 0
-                score_sound_countdown = 100
+                scoring_enabled = True
                 game_active = True
                 
         # Make the bird flap its wings
@@ -178,12 +192,9 @@ while True:
         draw_pipes(pipe_list)
 
         # Score
-        score += 0.01
+        score_increment()
         score_display(game_active)
-        score_sound_countdown -= 1
-        if score_sound_countdown <= 0:
-            score_sound.play()
-            score_sound_countdown = 100
+
     else:
         screen.blit(game_over_surface,game_over_rect)
         high_score = update_scores(score, high_score)

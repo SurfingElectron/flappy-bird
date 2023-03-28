@@ -93,12 +93,12 @@ def score_increment():
 pygame.init()
 screen = pygame.display.set_mode((576,1024))
 clock = pygame.time.Clock()
-game_font = pygame.font.Font('04B_19.ttf', 40)
+game_font = pygame.font.Font('fonts/04B_19.ttf', 40)
 
 # GAME VARIABLES
 gravity = 0.25
 bird_movement = 0
-game_active = True
+game_active = False
 score = 0
 high_score = 0
 scoring_enabled = True
@@ -124,7 +124,7 @@ bird_rect = bird_surface.get_rect(center = (100, 512))
 BIRDFLAP = pygame.USEREVENT + 1
 pygame.time.set_timer(BIRDFLAP, 200)
 
-game_over_surface = pygame.transform.scale2x(pygame.image.load('assets/gameover.png').convert_alpha())
+game_over_surface = pygame.transform.scale2x(pygame.image.load('assets/message.png').convert_alpha())
 game_over_rect = game_over_surface.get_rect(center = (288, 512))
 
 # SOUNDS
